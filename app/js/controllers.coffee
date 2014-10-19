@@ -1,8 +1,11 @@
 angular = require('angular')
 
-module.exports = angular.module('PuntersBotApp.controllers', [])
+angular.module('PuntersBotApp.controllers', [])
   .controller 'HomeController', ['$scope', ($scope) ->
+      require('./../styles/homepage.scss')
+      require('./../styles/pricing.scss')
       $('body').addClass('homepage')
+
       scrollHandler = ->
             if $(".navbar").offset().top > 30
               $(".navbar-fixed-top").addClass("top-nav-collapse")
@@ -26,6 +29,7 @@ module.exports = angular.module('PuntersBotApp.controllers', [])
             $('.homepage .navbar-toggle:visible').click()
   ]
   .controller 'SimulationController', ['$scope', '$http', '$log', ($scope, $http, $log) ->
+      require('./../styles/simulation.scss')
       $scope.exchanges = [{id: 1, name:'Australia'},{id: 2, name: 'International'}]
       $scope.eventTypes = [{id: 7, name: 'Horse Racing'},{id: 4339, name: 'Greyhound Racing'}]
 
@@ -127,6 +131,3 @@ module.exports = angular.module('PuntersBotApp.controllers', [])
             @renderSummary(processedData)
             @renderChart(processedData)
   ]
-       
-
-  

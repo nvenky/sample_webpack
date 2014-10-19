@@ -1,47 +1,33 @@
 'use strict';
-//var webpackConfig = require("./webpack.config.js");
+var webpack = require("webpack");
+var webpackConfig = require("./webpack.config.js");
 
 module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-webpack');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
 	grunt.initConfig({
+		clean: ['./dist'],
+		
 		webpack: {
-			//options: webpackConfig,
+			options: webpackConfig,
 			build: {
-				entry: './app/index.coffee',
-				output: {
-					path: 'dist/',
-					filename: 'bundle-[hash].js',
-				},
-				module: {
-					loaders: [
-						// Exports Angular
-						//{ test: /[\/]angular\.js$/, loader: "exports?angular" },
-						// Script Loaders
-						{ test: /\.coffee$/, loader: "coffee" },
-						// Markup Loaders
-						{ test: /\.html$/, loader: "html" },
-						//{ test: /\.jade$/, loader: "template-html" },
-						// Style Loaders, style! inlines the css into the bundle files
-						{ test: /\.css$/, loader: "style!css" },
-						{ test: /\.scss$/, loader: "style!css!sass" },
-						{ test: /\.less$/, loader: "style!css!less" },
-						//Font
-						{ test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
-						{ test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
-					]
-				}
+				plugins: webpackConfig.plugins.concat(
+					new webpack.DefinePlugin({
+					"process.env": {
+						// This has effect on the react lib size
+						"NODE_ENV": JSON.stringify("production")
+					}
+				}),
+				new webpack.optimize.DedupePlugin(),
+				new webpack.optimize.UglifyJsPlugin()
+				)
+			},
+			"build-dev": {
+				devtool: "sourcemap",
+				debug: true
 			}
 		},
-		jshint: {
-			all: {
-				options: {
-					jshintrc: './.jshintrc'
-				},
-				src: [
-					'**/index.js', '*.js', '!test/**/*.js', '!node_modules/**/*.js']
-			}
-		}/*,
 		"webpack-dev-server": {
 			options: {
 				webpack: webpackConfig,
@@ -54,8 +40,8 @@ module.exports = function (grunt) {
 					debug: true
 				}
 			}
-		}*/
+		}
 	});
 
-	grunt.registerTask('default', ['webpack', 'jshint', 'webpack-dev-server']);
+	grunt.registerTask('default', ['clean', 'webpack', 'webpack-dev-server']);
 }
